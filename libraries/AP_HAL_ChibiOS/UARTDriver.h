@@ -44,8 +44,11 @@ public:
     uint32_t available() override;
     uint32_t txspace() override;
     int16_t read() override;
+    ssize_t read(uint8_t *buffer, uint16_t count) override;
     int16_t read_locked(uint32_t key) override;
     void _timer_tick(void) override;
+
+    bool discard_input() override;
 
     size_t write(uint8_t c) override;
     size_t write(const uint8_t *buffer, size_t size) override;
@@ -159,7 +162,7 @@ private:
 #endif
     ByteBuffer _readbuf{0};
     ByteBuffer _writebuf{0};
-    Semaphore _write_mutex;
+    HAL_Semaphore _write_mutex;
 #ifndef HAL_UART_NODMA
     const stm32_dma_stream_t* rxdma;
     const stm32_dma_stream_t* txdma;
@@ -238,3 +241,6 @@ private:
     void thread_init();
     static void uart_thread(void *);
 };
+
+// access to usb init for stdio.cpp
+void usb_initialise(void);
